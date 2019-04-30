@@ -1,0 +1,17 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: logging-stack-service-graylog
+  labels:
+    app: logging-stack-graylog
+spec:
+  type: NodePort
+  ports:
+  - name: graylog
+    port: 9000
+    protocol: TCP
+    targetPort: 9000
+    nodePort: 30300
+  selector:
+    app: logging-stack-graylog
