@@ -1,18 +1,18 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: logging-stack-graylog
+  name: logging-stack-elg
   labels:
-    app: logging-stack-graylog
+    app: logging-stack-elg
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: logging-stack-graylog
+      app: logging-stack-elg
   template:
     metadata:
       labels:
-        app: logging-stack-graylog
+        app: logging-stack-elg
     spec:
       containers:
 
@@ -56,3 +56,18 @@ spec:
           value: "graylog"
         - name: GRAYLOG_ELASTICSEARCH_SHARDS
           value: "1"
+
+      # logstash
+      - name: logstash
+        image: observabilitystack/logstash:6.5.3-1
+        volumeMounts:
+          - name: logstash-configuration
+            mountPath: /usr/share/logstash/pipeline/logstash.conf
+            readOnly: true
+            subPath: logstash.conf
+
+      volumes:
+      - name: logstash-configuration
+        configMap:
+          defaultMode: 0644
+          name: logging-stack-logstash-configuration

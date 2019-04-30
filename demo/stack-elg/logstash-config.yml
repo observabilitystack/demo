@@ -4,7 +4,7 @@ kind: ConfigMap
 metadata:
   name: logging-stack-logstash-configuration
   labels:
-    app: logging-stack-logstash
+    app: logging-stack-elg
 data:
   logstash.conf: |-
     input {
@@ -79,7 +79,7 @@ data:
       }
     }
     output {
-      #stdout { codec => json }
+      # stdout { codec => json }
       gelf {
         host => ["localhost"]
         sender => "%{source}"

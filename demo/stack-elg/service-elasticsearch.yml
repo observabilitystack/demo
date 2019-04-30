@@ -4,7 +4,7 @@ kind: Service
 metadata:
   name: logging-stack-service-elasticsearch
   labels:
-    app: logging-stack-graylog
+    app: logging-stack-elg
 spec:
   type: NodePort
   ports:
@@ -14,4 +14,4 @@ spec:
     targetPort: 9200
     nodePort: 30200
   selector:
-    app: logging-stack-graylog
+    app: logging-stack-elg

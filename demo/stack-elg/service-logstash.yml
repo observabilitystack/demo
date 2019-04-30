@@ -4,7 +4,7 @@ kind: Service
 metadata:
   name: logging-stack-service-logstash
   labels:
-    app: logging-stack-logstash
+    app: logging-stack-elg
 spec:
   type: NodePort
   ports:
@@ -14,4 +14,4 @@ spec:
     targetPort: 5044
     nodePort: 30544
   selector:
-    app: logging-stack-logstash
+    app: logging-stack-elg
