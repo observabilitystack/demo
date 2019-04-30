@@ -49,7 +49,7 @@ data:
           remove_field => [ "[kubernetes][container]" ]
         }
       }
-      if [kubernetes][annotations][org][observabilitystack/logs][style] == "web-access-log" {
+      if [kubernetes][annotations][org][o12stack/logs][style] == "web-access-log" {
         grok {
           match => { "message" => "^%{COMMONAPACHELOG}$" }
           tag_on_failure => [ "web-access-log-parsing-error" ]
@@ -57,12 +57,12 @@ data:
           overwrite => [ "clientip", "ident", "auth", "timestamp", "verb", "request", "httpversion", "response", "bytes", "referrer", "agent" ]
         }
       }
-      if [kubernetes][annotations][org][observabilitystack/logs][style] == "spring-boot-plain" {
+      if [kubernetes][annotations][org][o12stack/logs][style] == "spring-boot-plain" {
         mutate {
           add_tag => [ "spring-boot-plain-parsed" ]
         }
       }
-      if [kubernetes][annotations][org][observabilitystack/logs][style] == "spring-boot-json" {
+      if [kubernetes][annotations][org][o12stack/logs][style] == "spring-boot-json" {
         mutate {
           add_field => {
             # disambiguation: 'level' is added later by Graylog/gelf
