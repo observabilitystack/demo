@@ -1,0 +1,66 @@
+# configuration for filebeat (daemonset)
+# this yml consists mainly of the filebeat.yml config file
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: logging-stack-filebeat-configuration
+  labels:
+    app: logging-stack-filebeat
+data:
+  filebeat.yml: |-
+    # filebeat automatically discovers K8s pods and reads their logs
+    # if they meet certain conditions
+    filebeat.autodiscover:
+      providers:
+        - type: kubernetes
+          hints.enabled: true
+          # these annotations are read from the deployments'/pods' configs
+          include_annotations: ['org.o12stack/logs.enable','org.o12stack/logs.style']
+          templates:
+            # logging enabled and logging style Spring Boot - JSON
+            - condition:
+                and:
+                  - equals:
+                      kubernetes.annotations.org.o12stack/logs.enable: 'true'          
+                  - equals:
+                      kubernetes.annotations.org.o12stack/logs.style: 'spring-boot-json'          
+              config:
+                - type: docker
+                  containers.ids:
+                    - "${data.kubernetes.container.id}"    
+                  json.keys_under_root: 'true'
+            # logging enabled and logging style Spring Boot (plain text, multiline)
+            - condition:
+                and:
+                  - equals:
+                      kubernetes.annotations.org.o12stack/logs.enable: 'true'          
+                  - equals:
+                      kubernetes.annotations.org.o12stack/logs.style: 'spring-boot-plain'          
+              config:
+                - type: docker
+                  containers.ids:
+                    - "${data.kubernetes.container.id}"    
+                  multiline:
+                    negate: 'true'
+                    match: 'after'
+                    pattern: '^[0-9]{2,4}'
+              # logging enabled and logging style is Web Access Log (https://en.wikipedia.org/wiki/Common_Log_Format)
+            - condition:
+                and:
+                  - equals:
+                      kubernetes.annotations.org.o12stack/logs.enable: 'true'          
+                  - equals:
+                      kubernetes.annotations.org.o12stack/logs.style: 'web-access-log'          
+              config:
+                - type: docker
+                  containers.ids:
+                    - "${data.kubernetes.container.id}"    
+    processors:
+    - drop_event:
+        when:
+          not:
+            equals:
+              kubernetes.annotations.org.o12stack/logs.enable: 'true'
+    output.logstash:
+      hosts: ["logging-stack-service-logstash:5044"]

@@ -1,0 +1,45 @@
+# RBAC (roll based access control) for filebeat daemonset
+# This is necessary as filebeat needs to observe the K8s
+# pods that it should ship the logs for
+#
+# This file describes a cluster role 'filebeat' and maps
+# it to a service account via a 'cluster role binding'
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  name: logging-stack-filebeat-clusterrolebinding
+subjects:
+- kind: ServiceAccount
+  name: logging-stack-filebeat-serviceaccount
+  namespace: default
+roleRef:
+  kind: ClusterRole
+  name: logging-stack-filebeat-clusterrole
+  apiGroup: rbac.authorization.k8s.io
+
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRole
+metadata:
+  name: logging-stack-filebeat-clusterrole
+  labels:
+    app: logging-stack-filebeat
+rules:
+- apiGroups: [""]
+  resources:
+  - namespaces
+  - pods
+  verbs:
+  - get
+  - watch
+  - list
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: logging-stack-filebeat-serviceaccount
+  namespace: default
+  labels:
+    app: logging-stack-filebeat

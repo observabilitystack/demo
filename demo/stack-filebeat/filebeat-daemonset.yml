@@ -1,0 +1,44 @@
+# Filebeat daemon set
+# A 'daemon set' runs on each node of a K8s cluster
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  name: logging-stack-filebeat
+  labels:
+    app: logging-stack-filebeat
+spec:
+  updateStrategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: logging-stack-filebeat
+    spec:
+      # see filebeat-rbac.yml
+      serviceAccountName: logging-stack-filebeat-serviceaccount
+      terminationGracePeriodSeconds: 30
+      containers:
+      - name: filebeat
+        image: docker.elastic.co/beats/filebeat:6.5.3
+        # to read host's /var/lib/docker/containers
+        # this container needs to run under root
+        securityContext:
+          runAsUser: 0
+        volumeMounts:
+        # volume that contains the config
+        - name: filebeat-configuration
+          mountPath: /usr/share/filebeat/filebeat.yml
+          readOnly: true
+          subPath: filebeat.yml
+        # mapping of host's docker container dir (R/O!) to read the logs
+        - name: docker-host-container-dir
+          mountPath: /var/lib/docker/containers
+          readOnly: true
+      volumes:
+      - name: filebeat-configuration
+        configMap:
+          defaultMode: 0644
+          name: logging-stack-filebeat-configuration
+      - name: docker-host-container-dir
+        hostPath:
+          path: /var/lib/docker/containers
