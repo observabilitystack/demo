@@ -1,0 +1,89 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: logging-stack-logstash-configuration
+  labels:
+    app: logging-stack-logstash
+data:
+  logstash.conf: |-
+    input {
+      beats {
+        port => 5044
+      }
+    }
+    filter {
+      # flatten kubernetes data
+      if [kubernetes][namespace] {
+        mutate {
+          add_field => {
+            "k8s_namespace" => "%{[kubernetes][namespace]}"
+          }
+          remove_field => [ "[kubernetes][namespace]" ]
+        }
+      }
+      if [kubernetes][node][name] {
+        mutate {
+          add_field => {
+            "k8s_node" => "%{[kubernetes][node][name]}"
+          }
+          remove_field => [ "[kubernetes][node]" ]
+        }
+      }
+      if [kubernetes][pod][name] {
+        mutate {
+          add_field => {
+            "k8s_pod" => "%{[kubernetes][pod][name]}"
+          }
+          remove_field => [ "[kubernetes][pod]", "[kubernetes][replicaset]" ]
+        }
+      }
+      if [kubernetes][container][name] {
+        mutate {
+          add_field => {
+            "k8s_container" => "%{[kubernetes][container][name]}"
+          }
+          replace => {
+            "source" => "%{[kubernetes][container][name]}"
+          }
+          remove_field => [ "[kubernetes][container]" ]
+        }
+      }
+      if [kubernetes][annotations][org][observabilitystack/logs][style] == "web-access-log" {
+        grok {
+          match => { "message" => "^%{COMMONAPACHELOG}$" }
+          tag_on_failure => [ "web-access-log-parsing-error" ]
+          add_tag => [ "web-access-log-parsed" ]
+          overwrite => [ "clientip", "ident", "auth", "timestamp", "verb", "request", "httpversion", "response", "bytes", "referrer", "agent" ]
+        }
+      }
+      if [kubernetes][annotations][org][observabilitystack/logs][style] == "spring-boot-plain" {
+        mutate {
+          add_tag => [ "spring-boot-plain-parsed" ]
+        }
+      }
+      if [kubernetes][annotations][org][observabilitystack/logs][style] == "spring-boot-json" {
+        mutate {
+          add_field => {
+            # disambiguation: 'level' is added later by Graylog/gelf
+            "log_level" => "%{[level]}"
+          }
+          add_tag => [ "spring-boot-json-parsed" ]
+        }
+      }
+      mutate {
+        # remove some filebeat metadata we don't need
+        remove_field => [ "[beat][hostname]", "[offset]", "[input][type]", "[prospector][type]", "[stream]" ]
+        # remove kubernetes metadata we don't need
+        remove_field => [ "[kubernetes][labels]", "[kubernetes][annotations]" ]
+      }
+    }
+    output {
+      #stdout { codec => json }
+      gelf {
+        host => ["localhost"]
+        sender => "%{source}"
+      }
+    }
+
+
