@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: logging-application-spring-boot
+  labels:
+    app: logging-application-spring-boot
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: logging-application-spring-boot
+  template:
+    metadata:
+      labels:
+        app: logging-application-spring-boot
+      annotations:
+        org.o12stack/logs.enable: "true"
+        org.o12stack/logs.style: "spring-boot-plain"
+    spec:
+      containers:
+      - name: logging-application-spring-boot
+        image: observabilitystack/logging-test-driver-spring-boot:6
+        env:
+        - name: LOG_LINES_PER_MINUTE
+          value: '100'

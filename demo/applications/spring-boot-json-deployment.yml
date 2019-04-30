@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: logging-application-spring-boot-json
+  labels:
+    app: logging-application-spring-boot-json
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: logging-application-spring-boot-json
+  template:
+    metadata:
+      labels:
+        app: logging-application-spring-boot-json
+      annotations:
+        org.o12stack/logs.enable: "true"
+        org.o12stack/logs.style: "spring-boot-json"
+    spec:
+      containers:
+      - name: logging-application-spring-boot-json
+        image: observabilitystack/logging-test-driver-spring-boot:6
+        env:
+        - name: LOG_LINES_PER_MINUTE
+          value: '100'
+        - name: SPRING_PROFILES_ACTIVE
+          value: 'json'

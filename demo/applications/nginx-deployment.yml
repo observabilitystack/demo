@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: logging-application-nginx
+  labels:
+    app: logging-application-nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: logging-application-nginx
+  template:
+    metadata:
+      labels:
+        app: logging-application-nginx
+      annotations:
+        org.o12stack/logs.enable: "true"
+        org.o12stack/logs.style: "web-access-log"
+    spec:
+      containers:
+      - name: logging-application-nginx
+        image: observabilitystack/logging-test-driver-nginx:3
+        env:
+        - name: LOG_LINES_PER_MINUTE
+          value: "500"
