@@ -42,11 +42,73 @@ Three demo applications ("test drivers") can shoot their logs into the stack at 
 
 ## Running the demo
 
-TODO, sub-document
+This section shows you how to run the demo. For further details, please have a closer look at the mentioned config files, we tried to write them as verbose as possible...
 
-## Annotations, fields and log formats
+### ELG stack
 
-TODO, sub-document
+The resources you need for the ELG stack can be found in `demo/stack-elg/'
+
+Set up the needed Kubernetes services by applying the corresponding files:
+
+    kubectl apply -f service-elasticsearch.yml
+    kubectl apply -f service-graylog.yml
+    kubectl apply -f service-logstash.yml
+
+The configuration for logstash lives in a `ConfigMap`:
+
+    kubectl apply -f logstash-config.yml
+
+Now, you can do the actual deployment that starts the stack:
+
+    kubectl apply -f elg-deployment.yml
+
+As of now, we cannot configure the Graylog server purely by the means of Kubernetes definitions, so there is a small script that does the rest:
+
+    ./start.sh
+
+The script is quite verbose and takes you to the rest of the setup of the ELG stack. At the end, this script shows you the URL of the Graylog UI where you can (hopefully) see your logs once you completed the startup!
+
+### Filebeat daemonset
+
+The resources you need for the Filebeat DaemonSet can be found in `demo/stack-filebeat/'
+
+The configuration for filebeat lives in a `ConfigMap`:
+
+    kubectl apply -f filebeat-configuration.yml
+
+As filebeat wants to access the Docker logs of the Kubernetes node it is running in, you have to setup some permissions by applying the following file:
+
+    kubectl apply -f filebeat-rbac.yml
+
+(Refer to the file for details...)
+
+Now, you can do the actual deployment that starts filebeat:
+
+    kubectl apply -f filebeat-daemonset.yml
+
+### Logging applications
+
+The applications that fire the logs are some test drivers we provide via DockerHub. Have a look at the corresponding configurations for details.
+
+For each logging application we provide one deployment file inside `demo/applications/`
+
+#### NGINX
+
+This container emits standard web access logs.
+
+    kubectl apply -f nginx-deployment.yml
+
+#### Spring Boot
+
+This container emits logs from a Spring Boot application that uses `log4j2`:
+
+    kubectl apply -f spring-boot-deployment.yml
+
+#### Spring Boot (JSON)
+
+This container emits logs from a Spring Boot application that uses `log4j2` and wraps them in a single line JSON.
+
+    kubectl apply -f spring-boot-json-deployment.yml
 
 ## Resources
 
