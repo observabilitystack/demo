@@ -58,8 +58,11 @@ data:
         }
       }
       if [kubernetes][annotations][org][o12stack/logs][style] == "spring-boot-plain" {
-        mutate {
+        grok {
+          match => { "message" => "%{TIMESTAMP_ISO8601:timestamp} %{LOGLEVEL:log_level}\s*---\s*\[%{NOTSPACE:thread}\] %{NOTSPACE:loggerName}\s*–\s* %{GREEDYDATA:message}" }
+          tag_on_failure => [ "spring-boot-plain-parsing-error" ]
           add_tag => [ "spring-boot-plain-parsed" ]
+          overwrite => [ "message" ]
         }
       }
       if [kubernetes][annotations][org][o12stack/logs][style] == "spring-boot-json" {

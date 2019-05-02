@@ -16,3 +16,5 @@ Some sources we did find useful while building this demo which are not being ref
 * Elastic dosc on hint-based auto discovery: https://www.elastic.co/guide/en/beats/filebeat/current/configuration-autodiscover-hints.html
 * Manage multiline messages: https://www.elastic.co/guide/en/beats/filebeat/current/multiline-examples.html
 * Access Docker Daemon in Minikube: https://kubernetes.io/docs/setup/minikube/#use-local-images-by-re-using-the-docker-daemon
+* Grok Debugger: https://grokdebug.herokuapp.com/
+* Grok Patterns: https://github.com/logstash-plugins/logstash-patterns-core/blob/master/patterns/grok-patterns
