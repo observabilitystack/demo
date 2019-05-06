@@ -18,3 +18,4 @@ Some sources we did find useful while building this demo which are not being ref
 * Access Docker Daemon in Minikube: https://kubernetes.io/docs/setup/minikube/#use-local-images-by-re-using-the-docker-daemon
 * Grok Debugger: https://grokdebug.herokuapp.com/
 * Grok Patterns: https://github.com/logstash-plugins/logstash-patterns-core/blob/master/patterns/grok-patterns
+* Running Minikube with vm driver 'none': https://medium.com/@nieldw/running-minikube-with-vm-driver-none-47de91eab84c
