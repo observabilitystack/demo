@@ -64,16 +64,20 @@ The configuration for logstash lives in a `ConfigMap`:
 
     kubectl apply -f logstash-config.yml
 
-Now, you can do the actual deployments that starts the stack:
+Now, you can deploy the Graylog:
 
     kubectl apply -f graylog-deployment.yml
-    kubectl apply -f logstash-deployment.yml
 
 As of now, we cannot configure the Graylog server purely by the means of Kubernetes definitions, so there is a small script that does the rest:
 
     ./start.sh
 
 The script is quite verbose and takes you to the rest of the setup of the ELG stack. At the end, this script shows you the URL of the Graylog UI where you can (hopefully) see your logs once you completed the startup!
+
+After Graylog is up and running and accessible via a browser, you can deploy Logstash:
+
+    kubectl apply -f logstash-deployment.yml
+
 
 ### Filebeat daemonset
 
