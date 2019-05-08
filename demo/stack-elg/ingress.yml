@@ -1,0 +1,15 @@
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  labels:
+    app: logging-stack-elg
+  name: logging-stack-elg
+spec:
+  rules:
+  - host: local.o12stack.org
+    http:
+      paths:
+      - backend:
+          serviceName: logging-stack-service-graylog-ui
+          servicePort: 9000
