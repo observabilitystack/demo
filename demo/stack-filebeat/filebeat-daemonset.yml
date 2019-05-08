@@ -19,7 +19,7 @@ spec:
       terminationGracePeriodSeconds: 30
       containers:
       - name: filebeat
-        image: docker.elastic.co/beats/filebeat:6.5.3
+        image: docker.elastic.co/beats/filebeat:6.7.2
         # to read host's /var/lib/docker/containers
         # this container needs to run under root
         securityContext:
