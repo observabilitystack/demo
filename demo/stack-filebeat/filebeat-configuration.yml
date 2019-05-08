@@ -62,5 +62,8 @@ data:
           not:
             equals:
               kubernetes.annotations.org.o12stack/logs.enable: 'true'
+    
     output.logstash:
-      hosts: ["logging-stack-service-logstash:5044"]
+      hosts: ["logstash:5044"]
+
+

@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: logstash
+  labels:
+    app: logstash
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: logstash
+  template:
+    metadata:
+      labels:
+        app: logstash
+    spec:
+      containers:
+
+      # logstash
+      - name: logstash
+        image: observabilitystack/logstash:6.5.3-1
+        volumeMounts:
+          - name: logstash-configuration
+            mountPath: /usr/share/logstash/pipeline/logstash.conf
+            readOnly: true
+            subPath: logstash.conf
+
+      volumes:
+      - name: logstash-configuration
+        configMap:
+          defaultMode: 0644
+          name: logging-stack-logstash-configuration

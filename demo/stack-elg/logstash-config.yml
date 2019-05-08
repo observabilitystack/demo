@@ -82,9 +82,10 @@ data:
       }
     }
     output {
-      # stdout { codec => json }
       gelf {
-        host => ["localhost"]
+        host => ["graylog"]
+        port => 12201
+        protocol => "TCP"
         sender => "%{source}"
       }
     }
