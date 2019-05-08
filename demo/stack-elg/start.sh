@@ -38,21 +38,18 @@ graylog_configure_input=$(curl -sS --request POST \
   --header 'content-type: application/json' \
   --header 'x-requested-by: logging-demo' \
   --data '{
-  "title": "Gelf UDP",
-  "type": "org.graylog2.inputs.gelf.udp.GELFUDPInput",
+  "title": "gelf-tcp",
+  "type": "org.graylog2.inputs.gelf.tcp.GELFTCPInput",
   "configuration": {
-    "bind_address": "localhost",
-    "port": 12201,
-    "recv_buffer_size": 262144,
-    "override_source": null,
-    "decompress_size_limit": 8388608
+    "bind_address": "0.0.0.0",
+    "port": 12201
   },
   "global": true
 }')
 
 if [ $? -eq 0 ]
 then
-  echo "Graylog GELF UDP input configured successfully."
+  echo "Graylog GELF TCP input configured successfully."
   echo
   echo "see http://local.o12stack.org (admin/admin)"
   echo
