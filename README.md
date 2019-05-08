@@ -11,11 +11,11 @@ The logging stack consists of these components:
 ![The Logging Stack](docs/FelgStack.png)
 
 * The "ELG" stack
-  * running inside the Kubernetes deployment `elg-deployment`
+  * running inside the Kubernetes deployments `logstash` and `graylog`
   * `logstash` filters and enriches log records
   * `graylog` manages the indexes and provides a search and management UI
   * `elastic` stores the log records in indexes
-  * `mongo`is a Mongo DB that stores metadata for Graylog
+  * `mongo` is a Mongo DB that stores metadata for Graylog
 
 * Filebeat
   * running inside a Kubernetes daemonset `filebeat-daemonset` 
@@ -23,10 +23,9 @@ The logging stack consists of these components:
   * `filebeat` reads the Docker outputs of a subset of the running containers of a Kubernetes node
 
 * Communication and Services
-  * `logstash` offers a `beats` protocol Kubernetes service listening on port `5044`. A corresponding `NodePort` makes the service available for non-Kubernetes applications. The latter is not shown in this demo.
+  * `logstash` offers a `beats` protocol Kubernetes service listening on port `5044`.
   * `graylog` offers a `gelf` input service to ingest the logs into the index.
-  * On the other hand, `graylog` gives access to its web UI via a service. The corresponding `NodePort` makes sure that you can access the UI from the outside.
-  * The services offered by `elastic` were only used for troubleshooting and exploration, their usage is not shown in the demo.
+  * On the other hand, `graylog` gives access to its web UI via an ingress. 
 
 ## The Log Message Flow
 
@@ -48,19 +47,27 @@ This section shows you how to run the demo. For further details, please have a c
 
 The resources you need for the ELG stack can be found in `demo/stack-elg/'
 
-Set up the needed Kubernetes services by applying the corresponding files:
+Once Graylog is running, it will be accessed via `local.o12stack.org`.
+To prepare that access, you have to insert a corresponding entry in 
+your `/etc/hosts` file. These two commands do the trick:
 
-    kubectl apply -f service-elasticsearch.yml
-    kubectl apply -f service-graylog.yml
-    kubectl apply -f service-logstash.yml
+    sudo sed -i '' '/local.o12stack.org/d' /etc/hosts
+    sudo bash -c 'echo "$(minikube ip)    local.o12stack.org" >> /etc/hosts'
+
+Set up the required Kubernetes services/ingresses by applying the corresponding files:
+
+    kubectl apply -f graylog-service.yml
+    kubectl apply -f graylog-ingress.yml
+    kubectl apply -f logstash-service.yml
 
 The configuration for logstash lives in a `ConfigMap`:
 
     kubectl apply -f logstash-config.yml
 
-Now, you can do the actual deployment that starts the stack:
+Now, you can do the actual deployments that starts the stack:
 
-    kubectl apply -f elg-deployment.yml
+    kubectl apply -f graylog-deployment.yml
+    kubectl apply -f logstash-deployment.yml
 
 As of now, we cannot configure the Graylog server purely by the means of Kubernetes definitions, so there is a small script that does the rest:
 
@@ -70,7 +77,7 @@ The script is quite verbose and takes you to the rest of the setup of the ELG st
 
 ### Filebeat daemonset
 
-The resources you need for the Filebeat DaemonSet can be found in `demo/stack-filebeat/'
+The resources you need for the Filebeat DaemonSet can be found in `demo/stack-filebeat/`
 
 The configuration for filebeat lives in a `ConfigMap`:
 

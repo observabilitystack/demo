@@ -15,6 +15,13 @@ To start your local **minikube** installation, use this command:
 minikube start --vm-driver=hyperkit --memory 8192 --cpus 3
 ```
 
+We use an Kubernetes ingress to access the Graylog UI via the web browser.
+To enable ingresses in your minikube, use this command:
+
+```
+minikube addons enable ingress
+```
+
 ## Kubernetes Dashboard
 
 Although you can work with your Kubernetes cluster purely via the command line (`kubectl`), sometimes you might find a UI useful. To start a browser-based Dashboard UI:
