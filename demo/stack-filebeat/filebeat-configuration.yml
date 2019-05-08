@@ -4,9 +4,9 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: logging-stack-filebeat-configuration
+  name: filebeat-configuration
   labels:
-    app: logging-stack-filebeat
+    app: filebeat
 data:
   filebeat.yml: |-
     # filebeat automatically discovers K8s pods and reads their logs

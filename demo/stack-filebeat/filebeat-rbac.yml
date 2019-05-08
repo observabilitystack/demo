@@ -8,23 +8,23 @@
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRoleBinding
 metadata:
-  name: logging-stack-filebeat-clusterrolebinding
+  name: filebeat-clusterrolebinding
 subjects:
 - kind: ServiceAccount
-  name: logging-stack-filebeat-serviceaccount
+  name: filebeat-serviceaccount
   namespace: default
 roleRef:
   kind: ClusterRole
-  name: logging-stack-filebeat-clusterrole
+  name: filebeat-clusterrole
   apiGroup: rbac.authorization.k8s.io
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRole
 metadata:
-  name: logging-stack-filebeat-clusterrole
+  name: filebeat-clusterrole
   labels:
-    app: logging-stack-filebeat
+    app: filebeat
 rules:
 - apiGroups: [""]
   resources:
@@ -39,7 +39,7 @@ rules:
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: logging-stack-filebeat-serviceaccount
+  name: filebeat-serviceaccount
   namespace: default
   labels:
-    app: logging-stack-filebeat
+    app: filebeat
